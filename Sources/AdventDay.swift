@@ -81,16 +81,7 @@ extension AdventDay {
 extension AdventDay {
 
     static func testData() -> String {
-        do {
-            let day = String(describing: self)
-            let fileURL = URL(fileURLWithPath: "/Users/m.barinov/Desktop/Repos.nosync/Advent2024/Sources/Data/\(day).txt")
-            var data = try String(contentsOf: fileURL, encoding: .utf8)
-            _ = data.popLast()
-
-            return data
-        } catch {
-            print("Error reading file: \(error.localizedDescription)")
-            return ""
-        }
+        Self.loadData(challengeDay: self.day)
+            .trimmingCharacters(in: .newlines)
     }
 }

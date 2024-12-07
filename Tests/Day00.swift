@@ -6,7 +6,7 @@ import XCTest
 // pass.
 final class Day00Tests: XCTestCase {
   // Smoke test data provided in the challenge question
-    let testData = Day00.testData()
+  let testData = Day00.testData()
 
   func testPart1() throws {
     let challenge = Day00(data: testData)

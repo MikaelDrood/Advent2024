@@ -68,6 +68,7 @@ extension AdventDay {
 
     guard let dataURL,
       let data = try? String(contentsOf: dataURL, encoding: .utf8)
+        .trimmingCharacters(in: .newlines)
     else {
       fatalError("Couldn't find file '\(dataFilename).txt' in the 'Data' directory.")
     }

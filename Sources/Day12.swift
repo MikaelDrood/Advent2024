@@ -67,26 +67,41 @@ struct Day12: AdventDay {
             let ch = data[r][c]
 
             var count = 0
-            count += (!isValid(r - 1, c) || data[r - 1][c] != ch) &&
-                     (!isValid(r, c - 1) || data[r][c - 1] != ch) ? 1 : 0
-            count += (isValid(r - 1, c) && data[r - 1][c] == ch) &&
-                     (isValid(r, c - 1) && data[r][c - 1] == ch) &&
-                     (data[r - 1][c - 1] != ch) ? 1 : 0
-            count += (!isValid(r - 1, c) || data[r - 1][c] != ch) &&
-                     (!isValid(r, c + 1) || data[r][c + 1] != ch) ? 1 : 0
-            count += (isValid(r - 1, c) && data[r - 1][c] == ch) &&
-                     (isValid(r, c + 1) && data[r][c + 1] == ch) &&
-                      data[r - 1][c + 1] != ch ? 1 : 0
-            count += (!isValid(r, c + 1) || data[r][c + 1] != ch) &&
-                     (!isValid(r + 1, c) || data[r + 1][c] != ch) ? 1 : 0
-            count += (isValid(r, c + 1) && data[r][c + 1] == ch) &&
-                     (isValid(r + 1, c) && data[r + 1][c] == ch) &&
-                     data[r + 1][c + 1] != ch ? 1 : 0
-            count += (!isValid(r + 1, c) || data[r + 1][c] != ch) &&
-                     (!isValid(r, c - 1) || data[r][c - 1] != ch) ? 1 : 0
-            count += (isValid(r + 1, c) && data[r + 1][c] == ch) &&
-                     (isValid(r, c - 1) && data[r][c - 1] == ch) &&
-                     data[r + 1][c - 1] != ch ? 1 : 0
+            [[[-1, 0], [0, -1]],
+             [[-1, 0], [0,  1]],
+             [[0,  1], [1,  0]],
+             [[1,  0], [0, -1]]].forEach { ar in
+                let f = ar[0], s = ar[1]
+                let rD = f[0] + s[0], cD = f[1] + s[1]
+
+                count += (!isValid(r + f[0], c + f[1]) || data[r + f[0]][c + f[1]] != ch) &&
+                         (!isValid(r + s[0], c + s[1]) || data[r + s[0]][c + s[1]] != ch) ? 1 : 0
+                count += (isValid(r + f[0], c + f[1]) && data[r + f[0]][c + f[1]] == ch) &&
+                         (isValid(r + s[0], c + s[1]) && data[r + s[0]][c + s[1]] == ch) &&
+                         data[r + rD][c + cD] != ch ? 1 : 0
+            }
+
+//            var count = 0
+//            count += (!isValid(r - 1, c) || data[r - 1][c] != ch) &&
+//                     (!isValid(r, c - 1) || data[r][c - 1] != ch) ? 1 : 0
+//            count += (isValid(r - 1, c) && data[r - 1][c] == ch) &&
+//                     (isValid(r, c - 1) && data[r][c - 1] == ch) &&
+//                     (data[r - 1][c - 1] != ch) ? 1 : 0
+//            count += (!isValid(r - 1, c) || data[r - 1][c] != ch) &&
+//                     (!isValid(r, c + 1) || data[r][c + 1] != ch) ? 1 : 0
+//            count += (isValid(r - 1, c) && data[r - 1][c] == ch) &&
+//                     (isValid(r, c + 1) && data[r][c + 1] == ch) &&
+//                      data[r - 1][c + 1] != ch ? 1 : 0
+//            count += (!isValid(r, c + 1) || data[r][c + 1] != ch) &&
+//                     (!isValid(r + 1, c) || data[r + 1][c] != ch) ? 1 : 0
+//            count += (isValid(r, c + 1) && data[r][c + 1] == ch) &&
+//                     (isValid(r + 1, c) && data[r + 1][c] == ch) &&
+//                     data[r + 1][c + 1] != ch ? 1 : 0
+//            count += (!isValid(r + 1, c) || data[r + 1][c] != ch) &&
+//                     (!isValid(r, c - 1) || data[r][c - 1] != ch) ? 1 : 0
+//            count += (isValid(r + 1, c) && data[r + 1][c] == ch) &&
+//                     (isValid(r, c - 1) && data[r][c - 1] == ch) &&
+//                     data[r + 1][c - 1] != ch ? 1 : 0
             return count
         }
 

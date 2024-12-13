@@ -1,5 +1,6 @@
 import Algorithms
 import RegexBuilder
+import Foundation
 
 struct Machine {
     struct Button {
@@ -63,7 +64,27 @@ struct Day13: AdventDay {
     }
 
     func part2() -> Any {
-        return 0
+        let machines = parseData(10000000000000)
+        var cost = 0
+
+        for machine in machines {
+            let a = machine.a, b = machine.b, p = machine.prize
+
+            let D = Double(a.x * b.y - b.x * a.y)
+            guard D != 0 else { continue }
+
+            let Dx = Double(p.x * b.y - p.y * b.x)
+            let Dy = Double(p.y * a.x - p.x * a.y)
+
+            guard Dx != 0, Dy != 0 else { continue }
+
+            let x = Dx / D, y = Dy / D
+            guard x == round(x), y == round(y) else { continue}
+
+            cost += Int(x) * a.price + Int(y) * b.price
+        }
+
+        return cost
     }
 }
 
@@ -90,7 +111,7 @@ private extension Day13 {
         for match in data.matches(of: regex) {
             let a = Machine.Button(price: 3, x: Int(match.1)!, y: Int(match.2)!)
             let b = Machine.Button(price: 1, x: Int(match.3)!, y: Int(match.4)!)
-            let prize = Machine.Prize(x: Int(match.5)!, y: Int(match.6)!)
+            let prize = Machine.Prize(x: Int(match.5)! + priceIncement, y: Int(match.6)! + priceIncement)
 
             machines.append(Machine(a: a, b: b, prize: prize))
         }

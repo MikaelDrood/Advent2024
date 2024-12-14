@@ -53,7 +53,7 @@ struct Day14: AdventDay {
 
             visited.insert(k)
 
-            return 1 + dfs(y + 1, x - 1) + dfs(y + 1, x) + dfs(y + 1, x + 1)
+            return m[y][x] + dfs(y + 1, x - 1) + dfs(y + 1, x) + dfs(y + 1, x + 1)
         }
 
         for turn in 0 ..< Int.max {
@@ -81,9 +81,9 @@ struct Day14: AdventDay {
 
                     visited = []
                     let cloud = dfs(yy, xx)
-
                     guard cloud >= rCount / 3 else { continue }
 
+                    print("Cloud: ", cloud, rCount)
                     let prnt = m.reduce(into: "") { res, row in
                         res += "\n" + row.map { $0 == 0 ? "." : "\($0)" }.joined()
                     }

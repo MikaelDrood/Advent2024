@@ -64,47 +64,35 @@ struct Day16: AdventDay {
 
         let start = searchStart(map)
         map[start.0][start.1] = "."
-
+        
+        var minCost = Int.max
         var memo: [String: Int] = [:]
 
-        func search(_ r: Int, _ c: Int, _ dir: Dir) -> Int {
+        func search(_ r: Int, _ c: Int, _ cost: Int, _ dir: Dir) {
             guard map[r][c] != "E" else {
-                //snapshot(map)
-                return 0
+                minCost = min(minCost, cost)
+                return
             }
 
-            guard map[r][c] == "." else { return -1 }
+            guard map[r][c] == "." else { return }
 
             let k = "\(r)_\(c)_\(dir.rawValue)"
-            if let m = memo[k] {
-                //snapshot(map)
-                return m
+            if let m = memo[k], m < cost {
+                return
+            } else {
+                memo[k] = cost
             }
 
-            var minPoints = -1
-
-            Dir.allCases.forEach { turn in
-                //guard dir.opposite != turn else { return }
-
-                let (d2, turnCost) = dir.apply(turn)
+            Dir.allCases.forEach { step in
+                let (d2, stepCost) = dir.apply(step)
                 map[r][c] = d2.rawValue
-                let points = search(r + d2.move.0, c + d2.move.1, d2)
+                search(r + d2.move.0, c + d2.move.1, cost + stepCost + 1, d2)
                 map[r][c] = "."
-
-                if points == -1 {
-                    // do nothing
-                } else if minPoints == -1 {
-                    minPoints = turnCost + 1 + points
-                } else {
-                    minPoints = min(minPoints, turnCost + 1 + points)
-                }
             }
-
-            memo[k] = minPoints
-            return minPoints
         }
 
-        return search(start.0, start.1, .right)
+        search(start.0, start.1, 0, .right)
+        return minCost
     }
 
     func part2() -> Any {

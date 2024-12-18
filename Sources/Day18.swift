@@ -1,5 +1,6 @@
 
 import Algorithms
+import Collections
 
 struct Day18: AdventDay {
     // Save your data in a corresponding text file in the `Data` directory.
@@ -21,47 +22,52 @@ struct Day18: AdventDay {
         }
     }
 
-    func part1() -> Any {
-        let size = 71
-        let falling: [(Int, Int)] = parseData()
+    struct Node: Comparable {
+        let r: Int
+        let c: Int
+        let steps: Int
 
+        static func < (lhs: Day18.Node, rhs: Day18.Node) -> Bool {
+            lhs.steps < rhs.steps
+        }
+    }
+
+    func part1() -> Any {
+        //let size = 71, bytes = 1024
+        let size = 7, bytes = 12
         var map: [[Character]] = Array(repeating: Array(repeating: ".", count: size),
                                        count: size)
-        var steps = Int.max
-        var memo: [String: Int] = [:]
 
-        for i in 0 ..< 1024 {
-            let (rB, cB) = falling[i]
+        for (rB, cB) in parseData()[0..<bytes] {
             map[rB][cB] = "#"
         }
 
-        func run(_ r: Int, _ c: Int, _ turn: Int) {
-            if r == size - 1, c == size - 1 {
-                print(turn)
-                snapshot(map)
-                steps = min(steps, turn)
-                return
-            }
+        var steps: [String: Int] = [:]
+        var queue = Heap<Node>()
 
-            guard r >= 0, r < size, c >= 0, c < size else { return }
-            guard map[r][c] == "." else { return }
+        queue.insert(Node(r: 0, c: 0, steps: 0))
 
-            let k = "\(r)_\(c)"
-            if let m = memo[k], m < turn {
-                return
-            } else {
-               memo[k] = turn
-            }
+        while !queue.isEmpty {
+            let node = queue.popMin()!
 
-            map[r][c] = "o"
-            Dir.allCases.forEach { mut in
-                run(r + mut.move.0, c + mut.move.1, turn + 1)
+            guard node.r >= 0, node.r < size, node.c >= 0, node.c < size,
+                  map[node.r][node.c] == "."
+            else { continue }
+
+            let k = "\(node.r)_\(node.c)"
+
+            let visited = steps[k, default: Int.max]
+            guard node.steps < visited else { continue }
+
+            steps[k] = node.steps
+
+            [(-1, 0), (0, 1), (1, 0), (0, -1)].forEach { (rr, cc) in
+                let n = Node(r: node.r + rr, c: node.c + cc, steps: node.steps + 1)
+                queue.insert(n)
             }
-            map[r][c] = "."
         }
 
-        run(0, 0, 0)
-        return steps
+        return steps["\(size - 1)_\(size - 1)", default: 0]
     }
 
     func part2() -> Any {

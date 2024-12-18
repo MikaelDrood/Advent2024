@@ -23,7 +23,7 @@ struct Day16: AdventDay {
             switch self {
             case .up: dir == .down
             case .right: dir == .left
-            case .down: dir == .down
+            case .down: dir == .up
             case .left: dir == .right
             }
         }

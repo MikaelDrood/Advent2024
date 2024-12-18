@@ -6,22 +6,6 @@ struct Day18: AdventDay {
     // Save your data in a corresponding text file in the `Data` directory.
     var data: String
 
-    enum Dir: CaseIterable {
-        case up
-        case right
-        case down
-        case left
-
-        var move: (Int, Int) {
-            switch self {
-            case .left: (0, -1)
-            case .up: (-1, 0)
-            case .right: (0, 1)
-            case .down: (1, 0)
-            }
-        }
-    }
-
     struct Node: Comparable {
         let r: Int
         let c: Int
@@ -33,8 +17,8 @@ struct Day18: AdventDay {
     }
 
     func part1() -> Any {
-        //let size = 71, bytes = 1024
-        let size = 7, bytes = 12
+        let size = 71, bytes = 1024
+        //let size = 7, bytes = 12
         var map: [[Character]] = Array(repeating: Array(repeating: ".", count: size),
                                        count: size)
 
@@ -42,6 +26,50 @@ struct Day18: AdventDay {
             map[rB][cB] = "#"
         }
 
+        return searchPath(map: map) ?? 0
+    }
+
+    func part2() -> Any {
+        //let size = 71, bytes = 1024
+        let size = 7, bytes = 12
+        var map: [[Character]] = Array(repeating: Array(repeating: ".", count: size),
+                                       count: size)
+        let fallingBytes = parseData()
+
+        for (rB, cB) in fallingBytes[0..<bytes]{
+            map[rB][cB] = "#"
+        }
+
+        for i in bytes ..< fallingBytes.count {
+            let (rB, cB) = fallingBytes[i]
+            map[rB][cB] = "#"
+            let steps = searchPath(map: map)
+
+            if steps == -1 {
+                return "\(cB),\(rB)"
+            }
+        }
+
+        return -1
+    }
+}
+
+private extension Day18 {
+    func parseData() -> [(Int, Int)] {
+        return data.components(separatedBy: "\n").map {
+            let coord = $0.components(separatedBy: ",")
+            return (Int(coord[1])!, Int(coord[0])!)
+        }
+    }
+
+    func snapshot(_ map: [[Character]]) {
+        for r in map {
+            print(String(r))
+        }
+    }
+
+    func searchPath(map: [[Character]]) -> Int? {
+        let size = map.count
         var steps: [String: Int] = [:]
         var queue = Heap<Node>()
 
@@ -67,25 +95,6 @@ struct Day18: AdventDay {
             }
         }
 
-        return steps["\(size - 1)_\(size - 1)", default: 0]
-    }
-
-    func part2() -> Any {
-        return 0
-    }
-}
-
-private extension Day18 {
-    func parseData() -> [(Int, Int)] {
-        return data.components(separatedBy: "\n").map {
-            let coord = $0.components(separatedBy: ",")
-            return (Int(coord[1])!, Int(coord[0])!)
-        }
-    }
-
-    func snapshot(_ map: [[Character]]) {
-        for r in map {
-            print(String(r))
-        }
+        return steps["\(size - 1)_\(size - 1)", default: -1]
     }
 }

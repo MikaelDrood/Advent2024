@@ -19,41 +19,22 @@ struct Day16: AdventDay {
             }
         }
 
-        var opposite: Dir {
+        private func isOpposite(_ dir: Dir) -> Bool {
             switch self {
-            case .up: .down
-            case .down: .up
-            case .left: .right
-            case .right: .left
+            case .up: dir == .down
+            case .right: dir == .left
+            case .down: dir == .down
+            case .left: dir == .right
             }
         }
 
-        func apply(_ dir: Dir) -> (Dir, Int) {
-            let cost = switch self {
-            case .up:
-                switch dir {
-                case .up: 0
-                case .down: 2000
-                case .left, .right: 1000
-                }
-            case .right:
-                switch dir {
-                case .up, .down: 1000
-                case .right: 0
-                case .left: 2000
-                }
-            case .down:
-                switch dir {
-                case .down: 0
-                case .up: 2000
-                case .left, .right: 1000
-                }
-            case .left:
-                switch dir {
-                case .left: 0
-                case .up, .down: 1000
-                case .right: 2000
-                }
+        func turn(_ dir: Dir) -> (Dir, Int) {
+            let cost = if self == dir {
+                0
+            } else if self.isOpposite(dir) {
+                2000
+            } else {
+                1000
             }
             return (dir, cost)
         }
@@ -83,10 +64,10 @@ struct Day16: AdventDay {
                 memo[k] = cost
             }
 
-            Dir.allCases.forEach { step in
-                let (d2, stepCost) = dir.apply(step)
+            Dir.allCases.forEach { newDir in
+                let (d2, turnCost) = dir.turn(newDir)
                 map[r][c] = d2.rawValue
-                search(r + d2.move.0, c + d2.move.1, cost + stepCost + 1, d2)
+                search(r + d2.move.0, c + d2.move.1, cost + turnCost + 1, d2)
                 map[r][c] = "."
             }
         }
@@ -96,7 +77,52 @@ struct Day16: AdventDay {
     }
 
     func part2() -> Any {
-        return 0
+        var map = parseData()
+
+        let start = searchStart(map)
+        map[start.0][start.1] = "."
+
+        var minCost = Int.max
+        var memo: [String: Int] = [:]
+
+        var tiles: Set<String> = []
+        var pathTiles: Set<String> = []
+
+        func search(_ r: Int, _ c: Int, _ cost: Int, _ dir: Dir) {
+            guard map[r][c] != "E" else {
+                if cost <= minCost {
+                    tiles = cost < minCost ? pathTiles : tiles.union(pathTiles)
+                    minCost = cost
+                }
+                return
+            }
+
+            guard map[r][c] == "." else { return }
+
+            let pathKey = "\(r)_\(c)"
+            pathTiles.insert(pathKey)
+
+            let k = "\(r)_\(c)_\(dir.rawValue)"
+            if let m = memo[k], m < cost {
+                pathTiles.remove(pathKey)
+                return
+            } else {
+                memo[k] = cost
+            }
+
+            Dir.allCases.forEach { newDir in
+                let (d2, turnCost) = dir.turn(newDir)
+                map[r][c] = d2.rawValue
+                search(r + d2.move.0, c + d2.move.1, cost + turnCost + 1, d2)
+                map[r][c] = "."
+            }
+
+            pathTiles.remove(pathKey)
+        }
+
+        search(start.0, start.1, 0, .right)
+
+        return tiles.count + 1
     }
 }
 

@@ -6,18 +6,19 @@ import XCTest
 // pass.
 final class Day19Tests: XCTestCase {
   // Smoke test data provided in the challenge question
-  let testData = """
-r, wr, b, g, bwu, rb, gb, br
-
-brwrr
-bggr
-gbbr
-rrbgbr
-ubwu
-bwurrg
-brgr
-bbrgwb
-"""
+    let testData = Day19.testData()
+//  let testData = """
+//r, wr, b, g, bwu, rb, gb, br
+//
+//brwrr
+//bggr
+//gbbr
+//rrbgbr
+//ubwu
+//bwurrg
+//brgr
+//bbrgwb
+//"""
 
   func testPart1() throws {
     let challenge = Day19(data: testData)

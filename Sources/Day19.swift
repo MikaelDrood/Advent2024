@@ -30,7 +30,33 @@ struct Day19: AdventDay {
     }
 
     func part2() -> Any {
-        return 0
+        let (patterns, designs) = parseData()
+
+        return designs.reduce(into: 0) { res, design in
+            var prefixes: [String] = patterns.filter { design.hasPrefix($0) }
+            var prefixMap: [String: Int] = prefixes.reduce(into: [:]) { res, p in
+                res[p] = 1
+            }
+
+            while !prefixes.isEmpty {
+                let prefix = prefixes.removeFirst()
+                let count = prefixMap[prefix, default: 1]
+
+                for pattern in patterns {
+                    let newPrefix = prefix + pattern
+
+                    if design.hasPrefix(newPrefix) {
+                        if prefixMap[newPrefix] == nil {
+                            prefixes.append(newPrefix)
+                        }
+
+                        prefixMap[newPrefix, default: 0] += count
+                    }
+                }
+            }
+
+            res += prefixMap[design, default: 0]
+        }
     }
 }
 

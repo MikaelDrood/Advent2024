@@ -39,23 +39,18 @@ struct Day19: AdventDay {
             }
 
             while !prefixes.isEmpty {
-                for _ in 0 ..< prefixes.count {
-                    //var s = Set(prefixes[0 ..< prefixes.count])
+                let prefix = prefixes.removeFirst()
+                let count = prefixMap[prefix, default: 1]
 
-                    let prefix = prefixes.removeFirst()
-                    let count = prefixMap[prefix, default: 1]
+                for pattern in patterns {
+                    let newPrefix = prefix + pattern
 
-                    for pattern in patterns {
-                        let newPrefix = prefix + pattern
-
-                        if design.hasPrefix(newPrefix) {
-                            if prefixMap[newPrefix] == nil {
-                                //s.insert(newPrefix)
-                                prefixes.append(newPrefix)
-                            }
-
-                            prefixMap[newPrefix, default: 0] += count
+                    if design.hasPrefix(newPrefix) {
+                        if prefixMap[newPrefix] == nil {
+                            prefixes.append(newPrefix)
                         }
+
+                        prefixMap[newPrefix, default: 0] += count
                     }
                 }
             }

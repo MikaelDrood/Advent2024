@@ -6,7 +6,6 @@ import XCTest
 // pass.
 final class Day20Tests: XCTestCase {
   // Smoke test data provided in the challenge question
-    //let testData = Day20.testData()
   let testData = """
 ###############
 #...#...#.....#

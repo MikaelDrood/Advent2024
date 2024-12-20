@@ -7,15 +7,14 @@ class Day20: AdventDay {
     var rC = 0
     var cC = 0
 
-    var pathLen = Int.max
     var memo: [String: Int] = [:]
-    let savedSeconds = 100
+    let savedSeconds = 32
     var cheatsCount = 0
 
     struct Node {
         let r: Int
         let c: Int
-        let step: Int
+        let second: Int
     }
 
     required init(data: String) {
@@ -28,13 +27,17 @@ class Day20: AdventDay {
     func part1() -> Any {
         let (start, _) = searchStartFinish(map)
         run(start)
-        runCheatAnalyse(start)
+        runCheatAnalysis(start)
 
         return cheatsCount
     }
 
     func part2() -> Any {
-        return 0
+        let (start, _) = searchStartFinish(map)
+        run(start)
+        runCheatAnalysis2(start)
+
+        return cheatsCount
     }
 
 }
@@ -61,42 +64,39 @@ private extension Day20 {
     }
 
     func run(_ start: (Int, Int)) {
-        var q = [Node(r: start.0, c: start.1, step: 0)]
+        var q = [Node(r: start.0, c: start.1, second: 0)]
         while !q.isEmpty {
             let n = q.removeFirst()
             let k = "\(n.r)_\(n.c)"
 
             guard memo[k] == nil, isValid(n.r, n.c), map[n.r][n.c] != "#" else { continue }
 
-            memo[k] = n.step
+            memo[k] = n.second
             [(-1, 0), (0, 1), (1, 0), (0, -1)].forEach { (rM, cM) in
                 let r = n.r + rM, c = n.c + cM
-                q.append(Node(r: r, c: c, step: n.step + 1))
+                q.append(Node(r: r, c: c, second: n.second + 1))
             }
         }
     }
 
-    func runCheatAnalyse(_ start: (Int, Int)) {
-        var q = [Node(r: start.0, c: start.1, step: 0)]
+    func runCheatAnalysis(_ start: (Int, Int)) {
+        var q = [Node(r: start.0, c: start.1, second: 0)]
         while !q.isEmpty {
             let n = q.removeFirst()
             let k = "\(n.r)_\(n.c)"
 
             guard isValid(n.r, n.c) else { continue }
 
-            guard let m = memo[k], m == n.step else {
+            guard let m = memo[k], m == n.second else {
                 if map[n.r][n.c] == "#" {
-                    map[n.r][n.c] = "."
                     checkShortcut(n)
-                    map[n.r][n.c] = "#"
                 }
                 continue
             }
 
-            memo[k] = n.step
             [(-1, 0), (0, 1), (1, 0), (0, -1)].forEach { (rM, cM) in
                 let r = n.r + rM, c = n.c + cM
-                q.append(Node(r: r, c: c, step: n.step + 1))
+                q.append(Node(r: r, c: c, second: n.second + 1))
             }
         }
     }
@@ -106,7 +106,40 @@ private extension Day20 {
             let k = "\(n.r + mut.0)_\(n.c + mut.1)"
 
             guard let m = memo[k] else { return }
-            cheatsCount += (m - n.step - 1 >= savedSeconds) ? 1 : 0
+            cheatsCount += (m - n.second - 1 >= savedSeconds) ? 1 : 0
+        }
+    }
+
+    func runCheatAnalysis2(_ start: (Int, Int)) {
+        var q = [Node(r: start.0, c: start.1, second: 0)]
+        while !q.isEmpty {
+            let n = q.removeFirst()
+            let k = "\(n.r)_\(n.c)"
+
+            guard isValid(n.r, n.c), n.second == memo[k] else { continue }
+
+            checkShortcut2(n)
+
+            [(-1, 0), (0, 1), (1, 0), (0, -1)].forEach { (rM, cM) in
+                let r = n.r + rM, c = n.c + cM
+                q.append(Node(r: r, c: c, second: n.second + 1))
+            }
+        }
+    }
+
+    func checkShortcut2(_ n: Node) {
+        let size = 20
+        for rr in -size ... size {
+            for cc in -(size - abs(rr)) ... size - abs(rr) {
+                let r = n.r + rr, c = n.c + cc
+
+                guard isValid(r, c) else { continue }
+
+                let k = "\(r)_\(c)"
+                guard let second = memo[k] else { continue }
+
+                cheatsCount += second - n.second == savedSeconds ? 1 : 0
+            }
         }
     }
 

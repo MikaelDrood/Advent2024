@@ -31,32 +31,29 @@ struct Day19: AdventDay {
 
     func part2() -> Any {
         let (patterns, designs) = parseData()
+        var count = 0
+        var memo: [String: Int] = [:]
 
-        return designs.reduce(into: 0) { res, design in
-            var prefixes: [String] = patterns.filter { design.hasPrefix($0) }
-            var prefixMap: [String: Int] = prefixes.reduce(into: [:]) { res, p in
-                res[p] = 1
+        func search(_ prefix: String, _ design: String) {
+            guard design.hasPrefix(prefix) else { return }
+
+            guard design != prefix else {
+                count += 1
+                return
             }
 
-            while !prefixes.isEmpty {
-                let prefix = prefixes.removeFirst()
-                let count = prefixMap[prefix, default: 1]
-
-                for pattern in patterns {
-                    let newPrefix = prefix + pattern
-
-                    if design.hasPrefix(newPrefix) {
-                        if prefixMap[newPrefix] == nil {
-                            prefixes.append(newPrefix)
-                        }
-
-                        prefixMap[newPrefix, default: 0] += count
-                    }
-                }
+            patterns.forEach { p in
+                search(prefix + p, design)
             }
-
-            res += prefixMap[design, default: 0]
         }
+
+        designs.forEach { d in
+            patterns.forEach { p in
+                search(p, d)
+            }
+        }
+
+        return count
     }
 }
 

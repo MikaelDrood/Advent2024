@@ -8,10 +8,11 @@ class Day20: AdventDay {
     var cC = 0
 
     var memo: [String: Int] = [:]
-    let savedSeconds = 32
+    let savedSeconds = 50
     var cheatsCount = 0
+    var visited: Set<Node> = []
 
-    struct Node {
+    struct Node: Hashable {
         let r: Int
         let c: Int
         let second: Int
@@ -87,7 +88,7 @@ private extension Day20 {
 
             guard isValid(n.r, n.c) else { continue }
 
-            guard let m = memo[k], m == n.second else {
+            guard n.second == memo[k] else {
                 if map[n.r][n.c] == "#" {
                     checkShortcut(n)
                 }
@@ -116,9 +117,14 @@ private extension Day20 {
             let n = q.removeFirst()
             let k = "\(n.r)_\(n.c)"
 
-            guard isValid(n.r, n.c), n.second == memo[k] else { continue }
+            guard isValid(n.r, n.c) else { continue }
 
-            checkShortcut2(n)
+            guard n.second == memo[k] else {
+                if map[n.r][n.c] == "#" {
+                    checkShortcut2(n, n, n, 20)
+                }
+                continue
+            }
 
             [(-1, 0), (0, 1), (1, 0), (0, -1)].forEach { (rM, cM) in
                 let r = n.r + rM, c = n.c + cM
@@ -127,20 +133,19 @@ private extension Day20 {
         }
     }
 
-    func checkShortcut2(_ n: Node) {
-        let size = 20
-        for rr in -size ... size {
-            for cc in -(size - abs(rr)) ... size - abs(rr) {
-                let r = n.r + rr, c = n.c + cc
+    func checkShortcut2(_ from: Node, _ prev: Node, _ cur: Node, _ step: Int) {
+        guard step >= 0, isValid(cur.r, cur.c), !visited.contains(cur) else { return }
 
-                guard isValid(r, c) else { continue }
-
-                let k = "\(r)_\(c)"
-                guard let second = memo[k] else { continue }
-
-                cheatsCount += second - n.second == savedSeconds ? 1 : 0
-            }
+        if map[prev.r][prev.c] == "#", map[cur.r][cur.c] != "#" {
+            cheatsCount += cur.second - from.second == savedSeconds ? 1 : 0
         }
+
+        visited.insert(cur)
+        [(-1, 0), (0, 1), (1, 0), (0, -1)].forEach { mut in
+            let next = Node(r: cur.r + mut.0, c: cur.c + mut.1, second: cur.second + 1)
+            checkShortcut2(from, cur, next, step - 1)
+        }
+        visited.remove(cur)
     }
 
     func isValid(_ r: Int, _ c: Int) -> Bool {

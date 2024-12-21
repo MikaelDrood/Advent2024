@@ -42,6 +42,8 @@ class Day20: AdventDay {
     }
 
     func part2() -> Any {
+        cheatsCount = 0
+
         let (start, _) = searchStartFinish(map)
         run(start)
         runCheatAnalysis2()
@@ -79,9 +81,10 @@ private extension Day20 {
             let k = "\(n.r)_\(n.c)"
 
             guard seconds[k] == nil, isValid(n.r, n.c), map[n.r][n.c] != "#" else { continue }
-            path.append(n)
 
+            path.append(n)
             seconds[k] = n.second
+
             [(-1, 0), (0, 1), (1, 0), (0, -1)].forEach { (rM, cM) in
                 let r = n.r + rM, c = n.c + cM
                 q.append(Node(r: r, c: c, second: n.second + 1))
@@ -121,67 +124,30 @@ private extension Day20 {
     }
     func runCheatAnalysis2() {
 // A
-//        for n in path {
-//            let size = 20
-//            for rr in -size ... size {
-//                for cc in -(size - abs(rr)) ... size - abs(rr) {
-//                    let r = n.r + rr, c = n.c + cc
-//
-//                    guard let second = seconds["\(r)_\(c)"] else { continue }
-//                    cheatsCount += second - n.second - abs(r - n.r) - abs(c - n.c) >= savedSeconds ? 1 : 0
-//                }
-//            }
-//        }
-// B
-        for i in 0 ..< path.count {
-            let nI = path[i]
-            for j in i + 1 ..< path.count {
-                let nJ = path[j]
-                let cheatSeconds = abs(nJ.r - nI.r) + abs(nJ.c - nI.c)
+        for n in path {
+            let size = 20
+            for rr in -size ... size {
+                for cc in -(size - abs(rr)) ... size - abs(rr) {
+                    let r = n.r + rr, c = n.c + cc
 
-                guard cheatSeconds <= 20 else { continue }
-
-                cheatsCount += nJ.second - nI.second - cheatSeconds >= savedSeconds ? 1 : 0
+                    guard let second = seconds["\(r)_\(c)"] else { continue }
+                    cheatsCount += second - n.second - abs(r - n.r) - abs(c - n.c) >= savedSeconds ? 1 : 0
+                }
             }
         }
-    }
-
-// C incorrect
-//    func runCheatAnalysis2(_ start: (Int, Int)) {
+// B
 //        for i in 0 ..< path.count {
 //            let nI = path[i]
-//            let kI = "\(nI.r)_\(nI.c)"
-//
-//            let wallsI = [(-1, 0), (0, -1), (0, 1), (1, 0)].compactMap { mut in
-//                let next = Node(r: nI.r + mut.0, c: nI.c + mut.1, second: nI.second + 1)
-//                return map[next.r][next.c] == "#" ? next : nil
-//            }
-//
-//            loop: for j in i + 1 ..< path.count {
+//            for j in i + 1 ..< path.count {
 //                let nJ = path[j]
-//                let kJ = "\(nJ.r)_\(nJ.c)"
+//                let cheatSeconds = abs(nJ.r - nI.r) + abs(nJ.c - nI.c)
 //
-//                let wallsJ = [(-1, 0), (0, -1), (0, 1), (1, 0)].compactMap { mut in
-//                    let next = Node(r: nJ.r + mut.0, c: nJ.c + mut.1, second: nJ.second + 1)
-//                    return map[next.r][next.c] == "#" ? next : nil
-//                }
+//                guard cheatSeconds <= 20 else { continue }
 //
-//                for wallI in wallsI {
-//                    for wallJ in wallsJ {
-//                        let dist = abs(wallJ.r - wallI.r) + abs(wallJ.c - wallI.c) + 2
-//
-//                        guard dist <= 20 else { continue }
-//
-//                        if seconds[kJ]! - seconds[kI]! - dist == savedSeconds {
-//                            print(seconds[kJ]! - seconds[kI]! - dist)
-//                            cheatsCount += 1
-//                            break loop
-//                        }
-//                    }
-//                }
+//                cheatsCount += nJ.second - nI.second - cheatSeconds >= savedSeconds ? 1 : 0
 //            }
 //        }
-//    }
+    }
 
     func isValid(_ r: Int, _ c: Int) -> Bool {
         return r >= 0 && r < rC && c >= 0 && c < cC

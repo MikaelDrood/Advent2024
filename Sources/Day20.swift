@@ -120,26 +120,33 @@ private extension Day20 {
         }
     }
     func runCheatAnalysis2() {
-        for n in path {
-            let size = 20
-            for rr in -size ... size {
-                for cc in -(size - abs(rr)) ... size - abs(rr) {
-                    let r = n.r + rr, c = n.c + cc
+// A
+//        for n in path {
+//            let size = 20
+//            for rr in -size ... size {
+//                for cc in -(size - abs(rr)) ... size - abs(rr) {
+//                    let r = n.r + rr, c = n.c + cc
+//
+//                    guard let second = seconds["\(r)_\(c)"] else { continue }
+//                    cheatsCount += second - n.second - abs(r - n.r) - abs(c - n.c) >= savedSeconds ? 1 : 0
+//                }
+//            }
+//        }
+// B
+        for i in 0 ..< path.count {
+            let nI = path[i]
+            for j in i + 1 ..< path.count {
+                let nJ = path[j]
+                let cheatSeconds = abs(nJ.r - nI.r) + abs(nJ.c - nI.c)
 
-                    guard let second = seconds["\(r)_\(c)"] else { continue }
-//                    if second - n.second - abs(r - n.r) - abs(c - n.c) >= savedSeconds {
-//                        map[n.r][n.c] = "J"
-//                        map[r][c] = "J"
-//                        snapshot(map)
-//                        map[n.r][n.c] = "."
-//                        map[r][c] = "."
-//                    }
-                    cheatsCount += second - n.second - abs(r - n.r) - abs(c - n.c) >= savedSeconds ? 1 : 0
-                }
+                guard cheatSeconds <= 20 else { continue }
+
+                cheatsCount += nJ.second - nI.second - cheatSeconds >= savedSeconds ? 1 : 0
             }
         }
     }
 
+// C incorrect
 //    func runCheatAnalysis2(_ start: (Int, Int)) {
 //        for i in 0 ..< path.count {
 //            let nI = path[i]
@@ -150,7 +157,7 @@ private extension Day20 {
 //                return map[next.r][next.c] == "#" ? next : nil
 //            }
 //
-//            for j in i + 1 ..< path.count {
+//            loop: for j in i + 1 ..< path.count {
 //                let nJ = path[j]
 //                let kJ = "\(nJ.r)_\(nJ.c)"
 //
@@ -159,14 +166,14 @@ private extension Day20 {
 //                    return map[next.r][next.c] == "#" ? next : nil
 //                }
 //
-//                loop:for wallI in wallsI {
+//                for wallI in wallsI {
 //                    for wallJ in wallsJ {
 //                        let dist = abs(wallJ.r - wallI.r) + abs(wallJ.c - wallI.c) + 2
 //
 //                        guard dist <= 20 else { continue }
 //
 //                        if seconds[kJ]! - seconds[kI]! - dist == savedSeconds {
-//                            //print(kI, kJ)
+//                            print(seconds[kJ]! - seconds[kI]! - dist)
 //                            cheatsCount += 1
 //                            break loop
 //                        }

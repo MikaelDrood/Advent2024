@@ -8,8 +8,8 @@ final class Day22Tests: XCTestCase {
   // Smoke test data provided in the challenge question
   let testData = """
 1
-10
-100
+2
+3
 2024
 """
 
@@ -20,6 +20,6 @@ final class Day22Tests: XCTestCase {
 
   func testPart2() throws {
     let challenge = Day22(data: testData)
-    XCTAssertEqual(String(describing: challenge.part2()), "31")
+    XCTAssertEqual(String(describing: challenge.part2()), "23")
   }
 }

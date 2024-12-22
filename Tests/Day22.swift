@@ -6,6 +6,12 @@ import XCTest
 // pass.
 final class Day22Tests: XCTestCase {
   // Smoke test data provided in the challenge question
+//  let testData = """
+//1
+//10
+//100
+//2024
+//"""
   let testData = """
 1
 2

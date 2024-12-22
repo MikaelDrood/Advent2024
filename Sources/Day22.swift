@@ -15,48 +15,32 @@ struct Day22: AdventDay {
         var numbers = parseData()
         var prices = numbers.map { $0 % 10 }
 
-        var change1: [Int] = []
-        var change2: [Int] = []
-        var change3: [Int] = []
-        var change4: [Int] = []
+        var changes: [[Int]] = []
+        var banned: Set<String> = []
 
-        func add(_ changes: [Int]) {
-            if change1.isEmpty {
-                change1 = changes
-            } else if change2.isEmpty {
-                change2 = changes
-            } else if change3.isEmpty {
-                change3 = changes
-            } else if change4.isEmpty {
-                change4 = changes
-            } else {
-                change1 = change2
-                change2 = change3
-                change3 = change4
-                change4 = changes
+        var bananas: [String: Int] = [:]
+
+        func add(_ change: [Int]) {
+            changes.append(change)
+
+            if changes.count == 5 {
+                changes.removeFirst()
             }
 
             analyse()
         }
 
-        var b: [String: Int] = [:]
-        var banned: Set<String> = []
-
         func analyse() {
-            guard !change4.isEmpty else { return }
+            guard changes.count == 4 else { return }
 
-            for i in 0 ..< change1.count {
-                let k = "\(change1[i]),\(change2[i]),\(change3[i]),\(change4[i])"
+            for i in 0 ..< changes[0].count {
+                let k = "\(changes[0][i]),\(changes[1][i]),\(changes[2][i]),\(changes[3][i])"
                 let kBan = "\(i) \(k)"
 
                 guard !banned.contains(kBan) else { continue }
 
                 banned.insert(kBan)
-                b[k, default: 0] += prices[i]
-
-                if k == "-2,1,-1,3" {
-
-                }
+                bananas[k, default: 0] += prices[i]
             }
         }
 
@@ -70,7 +54,7 @@ struct Day22: AdventDay {
             add(changes)
         }
 
-        return b.values.max()!
+        return bananas.values.max()!
     }
 }
 

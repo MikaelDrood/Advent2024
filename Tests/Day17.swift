@@ -7,11 +7,11 @@ import XCTest
 final class Day17Tests: XCTestCase {
   // Smoke test data provided in the challenge question
   let testData = """
-Register A: 729
+Register A: 2024
 Register B: 0
 Register C: 0
 
-Program: 0,1,5,4,3,0
+Program: 0,3,5,4,3,0
 """
 
   func testPart1() throws {
@@ -21,6 +21,6 @@ Program: 0,1,5,4,3,0
 
   func testPart2() throws {
     let challenge = Day17(data: testData)
-    XCTAssertEqual(String(describing: challenge.part2()), "")
+    XCTAssertEqual(String(describing: challenge.part2()), "117440")
   }
 }

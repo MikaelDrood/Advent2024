@@ -40,7 +40,7 @@ struct Day17: AdventDay {
             }
         }
 
-        func execute() -> String {
+        func execute() -> [Int] {
             var output: [Int] = []
             var ptr = 0
 
@@ -67,17 +67,29 @@ struct Day17: AdventDay {
 
                 ptr = nextPtr
             }
-            return output.map { "\($0)" }.joined(separator: ",")
+            return output
         }
     }
 
     func part1() -> Any {
         let pc = parseData()
-        return pc.execute()
+        let output = pc.execute()
+
+        return output.map { "\($0)" }.joined(separator: ",")
     }
 
     func part2() -> Any {
-        return 0
+        let pc = parseData()
+        var output: [Int] = []
+        var a = 0
+
+        while output != pc.program {
+            pc.a = a
+            output = pc.execute()
+            a += 1
+        }
+
+        return a - 1
     }
 }
 

@@ -24,7 +24,33 @@ struct Day23: AdventDay {
     }
 
     func part2() -> Any {
-        return 0
+        let pairs = parseData2()
+        let nodes = Set(pairs.flatMap { $0 })
+
+        var parties: [[String]] = nodes.map { [$0] }
+        var didJoin = true
+
+        while didJoin {
+            didJoin = false
+            var newParties: [[String]] = []
+
+            for party in parties {
+                for node in nodes {
+                    if party.allSatisfy({ pairs.contains([$0, node].sorted()) }) {
+                        newParties.append((party + [node]).sorted())
+                        didJoin = true
+                    }
+                }
+            }
+
+            if didJoin {
+                parties = Array(Set(newParties))
+            }
+        }
+
+        let pass = parties.sorted { $0.count > $1.count }.first?.sorted().joined(separator: ",") ?? ""
+
+        return pass
     }
 }
 
@@ -39,5 +65,12 @@ private extension Day23 {
         }
 
         return map
+    }
+
+    func parseData2() -> Set<[String]> {
+        return data.components(separatedBy: "\n").reduce(into: []) { res, pair in
+            let nodes = pair.components(separatedBy: "-").sorted()
+            res.insert(nodes)
+        }
     }
 }

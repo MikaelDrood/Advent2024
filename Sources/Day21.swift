@@ -56,29 +56,41 @@ struct Day21: AdventDay {
     }
 
     func enter(_ code: String) -> Int {
-        var (r, c) = (3, 2)
+        let numPath = searchPath(numeric, code, (3, 2))
+        let roboPath = searchPath(directional, numPath, (0, 2))
+        let historiansPath = searchPath(directional, roboPath, (0, 2))
+
+        print(numPath, numPath.count)
+        print(roboPath, roboPath.count)
+        print(historiansPath, historiansPath.count)
+
+        return historiansPath.count
+    }
+
+    func searchPath(_ map: [[String]], _ word: String, _ start: (Int, Int)) -> String {
+        var (r, c) = start
         var path = ""
 
-        for num in code {
+        for sym in word {
             var heap = Heap<Node>()
-            heap.insert(Node(r: r, c: c, len: 0, seq: ""))
+            heap.insert(Node(r: r, c: c, len: 0, seq: path))
 
             var visited: [Node: Int] = [:]
 
             while !heap.isEmpty {
                 let n = heap.popMin()!
 
-                guard isValid(n, numeric) else { continue }
+                guard isValid(n, map) else { continue }
 
                 let memoLen = visited[n, default: Int.max]
-                guard n.len < memoLen else { continue }
+                guard n.len <= memoLen else { continue }
 
                 visited[n] = n.len
 
-                guard numeric[n.r][n.c] != String(num) else {
+                guard map[n.r][n.c] != String(sym) else {
                     r = n.r
                     c = n.c
-                    path += n.seq + "A"
+                    path = n.seq + "A"
                     break
                 }
 
@@ -92,13 +104,15 @@ struct Day21: AdventDay {
             }
         }
 
-        return path.count
+        return path
     }
 
-    func searchPath(_ map: [[String]], )
-
     func isValid(_ node: Node, _ pad: [[String]]) -> Bool {
-        return node.r >= 0 && node.r < pad.count && node.c >= 0 && node.c < pad[0].count && pad[node.r][node.c] != ""
+        return node.r >= 0 && 
+               node.r < pad.count &&
+               node.c >= 0 &&
+               node.c < pad[0].count &&
+               pad[node.r][node.c] != ""
     }
 
     func part2() -> Any {

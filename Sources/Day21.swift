@@ -27,11 +27,6 @@ struct Day21: AdventDay {
         return coords
     }()
 
-    static func distance(_ dir: Character) -> Int {
-        let coords = coords[Dir(rawValue: dir)!]!
-        return abs(0 - coords.0) + abs(2 - coords.1)
-    }
-
     enum Dir: Character, CaseIterable {
         case up = "^"
         case right = ">"
@@ -44,15 +39,6 @@ struct Day21: AdventDay {
             case .right: (0, 1)
             case .down: (1, 0)
             case .left: (0, -1)
-            }
-        }
-
-        var priority: Int {
-            switch self {
-            case .right: 3
-            case .up: 2
-            case .down: 1
-            case .left: 0
             }
         }
     }
@@ -73,13 +59,17 @@ struct Day21: AdventDay {
         }
     }
 
+    enum Sorting: CaseIterable {
+        case a
+        case b
+    }
+
     func part1() -> Any {
         let codes = parseData()
         var complexity = 0
 
         for code in codes {
             let seqLen = enter(code)
-            print(seqLen, Int(String(code.dropLast()))!)
             complexity += Int(String(code.dropLast()))! * seqLen
         }
 
@@ -87,18 +77,32 @@ struct Day21: AdventDay {
     }
 
     func enter(_ code: String) -> Int {
-        let numPath = searchPath(Self.numeric, code, (3, 2))
-        let roboPath = searchPath(Self.directional, numPath, (0, 2))
-        let historiansPath = searchPath(Self.directional, roboPath, (0, 2))
+        var minPathLen = Int.max
 
-        print(numPath, numPath.count)
-        print(roboPath, roboPath.count)
-        print(historiansPath, historiansPath.count)
+        for sorting in Sorting.allCases {
+            let numPath = searchPath(Self.numeric, code, (3, 2), sorting)
+            //print("N: ", numPath)
+            
+            guard isValid(numPath, Self.numeric, (3, 2)) else { continue }
 
-        return historiansPath.count
+            for sorting in Sorting.allCases {
+                let roboPath = searchPath(Self.directional, numPath, (0, 2), sorting)
+                //print("R: ", roboPath)
+                //guard isValid(roboPath, Self.directional, (0,2)) else { continue }
+
+                let histoPath = searchPath(Self.directional, roboPath, (0, 2), nil)
+                //print("H: ", histoPath, histoPath.count)
+
+                minPathLen = min(minPathLen, histoPath.count)
+            }
+        }
+
+        print(minPathLen, code)
+
+        return minPathLen
     }
 
-    func searchPath(_ map: [[String]], _ word: String, _ start: (Int, Int)) -> String {
+    func searchPath(_ map: [[String]], _ word: String, _ start: (Int, Int), _ sorting: Sorting?) -> String {
         var (r, c) = start
         var path = ""
 
@@ -121,10 +125,18 @@ struct Day21: AdventDay {
                 guard map[n.r][n.c] != String(sym) else {
                     r = n.r
                     c = n.c
-                    path += n.seq.sorted(by: {
-                        //Self.distance($0) < Self.distance($1)
-                        Dir(rawValue: $0)!.priority > Dir(rawValue: $1)!.priority
-                    }) + "A"
+
+                    switch sorting {
+                    case .a:
+                        path += n.seq.sorted(by: >)
+                    case .b:
+                        path += n.seq.sorted(by: <)
+                    case .none:
+                        path += n.seq
+                    }
+
+                    path += "A"
+
                     break
                 }
 
@@ -147,6 +159,23 @@ struct Day21: AdventDay {
                node.c >= 0 &&
                node.c < pad[0].count &&
                pad[node.r][node.c] != ""
+    }
+
+    func isValid(_ path: String, _ pad: [[String]], _ start: (Int, Int)) -> Bool {
+        var (r, c) = start
+
+        for ch in path {
+            guard let dir = Dir(rawValue: ch) else { continue }
+
+            r += dir.mut.0
+            c += dir.mut.1
+
+            if pad[r][c] == "" {
+                return false
+            }
+        }
+
+        return true
     }
 
     func part2() -> Any {

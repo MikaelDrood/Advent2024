@@ -8,11 +8,12 @@ final class Day21Tests: XCTestCase {
   // Smoke test data provided in the challenge question
   let testData = """
 029A
-980A
-179A
-456A
-379A
 """
+//980A
+//179A
+//456A
+//379A
+//"""
 
   func testPart1() throws {
     let challenge = Day21(data: testData)

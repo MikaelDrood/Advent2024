@@ -59,11 +59,6 @@ struct Day21: AdventDay {
         }
     }
 
-    enum Sorting: CaseIterable {
-        case a
-        case b
-    }
-
     func part1() -> Any {
         let codes = parseData()
         var complexity = 0
@@ -79,20 +74,20 @@ struct Day21: AdventDay {
     func enter(_ code: String) -> Int {
         var minPathLen = Int.max
 
-        for sorting in Sorting.allCases {
-            let numPath = searchPath(Self.numeric, code, (3, 2), sorting)
-            //print("N: ", numPath)
-            
+        //let numPath = searchPath(Self.numeric, code, (3, 2))
+        for numPath in searchPath(Self.numeric, code, (3, 2), true) {//permutate(numPath) {
+            print("N: ", numPath)
             guard isValid(numPath, Self.numeric, (3, 2)) else { continue }
-
-            for sorting in Sorting.allCases {
-                let roboPath = searchPath(Self.directional, numPath, (0, 2), sorting)
+            print("Valid")
+            //let roboPath = searchPath(Self.directional, numPath, (0, 2))
+            for roboPath in searchPath(Self.directional, numPath, (0, 2), true) {//permutate(roboPath) {
                 //print("R: ", roboPath)
-                //guard isValid(roboPath, Self.directional, (0,2)) else { continue }
+                guard isValid(roboPath, Self.directional, (0,2)) else { continue }
+                //print("Valid")
 
-                let histoPath = searchPath(Self.directional, roboPath, (0, 2), nil)
+                let histoPath = searchPath(Self.directional, roboPath, (0, 2), false).first!
+                //guard isValid(histoPath, Self.directional) else { continue }
                 //print("H: ", histoPath, histoPath.count)
-
                 minPathLen = min(minPathLen, histoPath.count)
             }
         }
@@ -102,9 +97,9 @@ struct Day21: AdventDay {
         return minPathLen
     }
 
-    func searchPath(_ map: [[String]], _ word: String, _ start: (Int, Int), _ sorting: Sorting?) -> String {
+    func searchPath(_ map: [[String]], _ word: String, _ start: (Int, Int), _ permutate: Bool) -> [String] {
         var (r, c) = start
-        var path = ""
+        var paths: [String] = []
 
         for sym in word {
             var heap = Heap<Node>()
@@ -126,16 +121,25 @@ struct Day21: AdventDay {
                     r = n.r
                     c = n.c
 
-                    switch sorting {
-                    case .a:
-                        path += n.seq.sorted(by: >)
-                    case .b:
-                        path += n.seq.sorted(by: <)
-                    case .none:
-                        path += n.seq
+                    guard permutate else {
+                        paths = [(paths.first ?? "") + n.seq + "A"]
+                        break
                     }
 
-                    path += "A"
+                    if paths.isEmpty {
+                        if Set(n.seq).count == 1 {
+                            paths.append(n.seq.sorted(by: >) + "A")
+                        } else {
+                            paths.append(n.seq.sorted(by: >) + "A")
+                            paths.append(n.seq.sorted(by: <) + "A")
+                        }
+                    } else {
+                        var permutations: [String] = []
+                        paths.forEach { permutations.append($0 + n.seq.sorted(by: >) + "A") }
+                        paths.forEach { permutations.append($0 + n.seq.sorted(by: <) + "A") }
+                        //path += n.seq.sorted() + "A"
+                        paths = permutations
+                    }
 
                     break
                 }
@@ -150,15 +154,14 @@ struct Day21: AdventDay {
             }
         }
 
-        return path
+        return paths
     }
 
     func isValid(_ node: Node, _ pad: [[String]]) -> Bool {
         return node.r >= 0 && 
                node.r < pad.count &&
                node.c >= 0 &&
-               node.c < pad[0].count &&
-               pad[node.r][node.c] != ""
+               node.c < pad[0].count
     }
 
     func isValid(_ path: String, _ pad: [[String]], _ start: (Int, Int)) -> Bool {

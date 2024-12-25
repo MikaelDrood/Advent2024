@@ -75,11 +75,7 @@ struct Day21: AdventDay {
         var minPathLen = Int.max
 
         for numPath in searchPath(Self.numeric, code, (3, 2), true) {
-            guard isValid(numPath, Self.numeric, (3, 2)) else { continue }
-
             for roboPath in searchPath(Self.directional, numPath, (0, 2), true) {
-                guard isValid(roboPath, Self.directional, (0,2)) else { continue }
-
                 let histoPath = searchPath(Self.directional, roboPath, (0, 2), false).first!
                 minPathLen = min(minPathLen, histoPath.count)
             }
@@ -111,21 +107,27 @@ struct Day21: AdventDay {
                 visited[n] = n.len
 
                 guard pad[n.r][n.c] != String(sym) else {
-                    r = n.r
-                    c = n.c
-
-                    guard permutate else {
-                        paths = [(paths.first ?? "") + n.seq + "A"]
-                        break
+                    defer {
+                        r = n.r
+                        c = n.c
                     }
 
                     let asc = String(n.seq.sorted(by: >) + "A")
                     let desc = String(n.seq.sorted(by: <) + "A")
 
+                    let subPaths = Array(Set([asc, desc])).filter { isValid($0, pad, (r, c)) }
+
+                    guard permutate else {
+                        paths = subPaths.map { (paths.first ?? "") + $0 }
+                        break
+                    }
+
                     if paths.isEmpty {
-                        paths = Array(Set([asc, desc]))
+                        paths = subPaths
                     } else {
-                        paths = paths.flatMap { [$0 + asc, $0 + desc] }
+                        paths = paths.flatMap { p in
+                            subPaths.map { p + $0 }
+                        }
                     }
 
                     break

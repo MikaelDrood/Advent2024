@@ -74,20 +74,13 @@ struct Day21: AdventDay {
     func enter(_ code: String) -> Int {
         var minPathLen = Int.max
 
-        //let numPath = searchPath(Self.numeric, code, (3, 2))
-        for numPath in searchPath(Self.numeric, code, (3, 2), true) {//permutate(numPath) {
-            print("N: ", numPath)
+        for numPath in searchPath(Self.numeric, code, (3, 2), true) {
             guard isValid(numPath, Self.numeric, (3, 2)) else { continue }
-            print("Valid")
-            //let roboPath = searchPath(Self.directional, numPath, (0, 2))
-            for roboPath in searchPath(Self.directional, numPath, (0, 2), true) {//permutate(roboPath) {
-                //print("R: ", roboPath)
+
+            for roboPath in searchPath(Self.directional, numPath, (0, 2), true) {
                 guard isValid(roboPath, Self.directional, (0,2)) else { continue }
-                //print("Valid")
 
                 let histoPath = searchPath(Self.directional, roboPath, (0, 2), false).first!
-                //guard isValid(histoPath, Self.directional) else { continue }
-                //print("H: ", histoPath, histoPath.count)
                 minPathLen = min(minPathLen, histoPath.count)
             }
         }
@@ -97,7 +90,7 @@ struct Day21: AdventDay {
         return minPathLen
     }
 
-    func searchPath(_ map: [[String]], _ word: String, _ start: (Int, Int), _ permutate: Bool) -> [String] {
+    func searchPath(_ pad: [[String]], _ word: String, _ start: (Int, Int), _ permutate: Bool) -> [String] {
         var (r, c) = start
         var paths: [String] = []
 
@@ -110,14 +103,14 @@ struct Day21: AdventDay {
             while !heap.isEmpty {
                 let n = heap.popMin()!
 
-                guard isValid(n, map) else { continue }
+                guard isValid(n, pad) else { continue }
 
                 let memoLen = visited[n, default: Int.max]
                 guard n.len < memoLen else { continue }
 
                 visited[n] = n.len
 
-                guard map[n.r][n.c] != String(sym) else {
+                guard pad[n.r][n.c] != String(sym) else {
                     r = n.r
                     c = n.c
 
@@ -126,19 +119,13 @@ struct Day21: AdventDay {
                         break
                     }
 
+                    let asc = String(n.seq.sorted(by: >) + "A")
+                    let desc = String(n.seq.sorted(by: <) + "A")
+
                     if paths.isEmpty {
-                        if Set(n.seq).count == 1 {
-                            paths.append(n.seq.sorted(by: >) + "A")
-                        } else {
-                            paths.append(n.seq.sorted(by: >) + "A")
-                            paths.append(n.seq.sorted(by: <) + "A")
-                        }
+                        paths = Array(Set([asc, desc]))
                     } else {
-                        var permutations: [String] = []
-                        paths.forEach { permutations.append($0 + n.seq.sorted(by: >) + "A") }
-                        paths.forEach { permutations.append($0 + n.seq.sorted(by: <) + "A") }
-                        //path += n.seq.sorted() + "A"
-                        paths = permutations
+                        paths = paths.flatMap { [$0 + asc, $0 + desc] }
                     }
 
                     break

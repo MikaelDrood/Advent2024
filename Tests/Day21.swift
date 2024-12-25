@@ -13,9 +13,6 @@ final class Day21Tests: XCTestCase {
 456A
 379A
 """
-//let testData = """
-//179A
-//"""
 
   func testPart1() throws {
     let challenge = Day21(data: testData)

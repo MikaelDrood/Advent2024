@@ -11,22 +11,6 @@ struct Day21: AdventDay {
     static let directional = [["", "^", "A"],
                               ["<", "v", ">"]]
 
-    static let coords: [Dir: (Int, Int)] = {
-        var coords: [Dir: (Int, Int)] = [:]
-
-        for r in 0 ..< directional.count {
-            for c in 0 ..< directional[0].count {
-                guard let ch = directional[r][c].first,
-                      let dir = Dir(rawValue: ch)
-                else { continue }
-
-                coords[dir] = (r, c)
-            }
-        }
-
-        return coords
-    }()
-
     enum Dir: Character, CaseIterable {
         case up = "^"
         case right = ">"
@@ -146,8 +130,18 @@ struct Day21: AdventDay {
         return paths
     }
 
+    func part2() -> Any {
+        return 0
+    }
+}
+
+private extension Day21 {
+    func parseData() -> [String] {
+        return data.components(separatedBy: "\n")
+    }
+
     func isValid(_ node: Node, _ pad: [[String]]) -> Bool {
-        return node.r >= 0 && 
+        return node.r >= 0 &&
                node.r < pad.count &&
                node.c >= 0 &&
                node.c < pad[0].count
@@ -168,15 +162,5 @@ struct Day21: AdventDay {
         }
 
         return true
-    }
-
-    func part2() -> Any {
-        return 0
-    }
-}
-
-private extension Day21 {
-    func parseData() -> [String] {
-        return data.components(separatedBy: "\n")
     }
 }
